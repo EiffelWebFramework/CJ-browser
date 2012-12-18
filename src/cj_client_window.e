@@ -72,7 +72,7 @@ feature {NONE} -- Initialization
 
 			create dm.make (vb, Current)
 			docking_manager := dm
-			create f.make_with_name ("layout.db")
+			create f.make ("layout.db")
 			dm.close_editor_place_holder
 			dm.contents.extend (information_tool.sd_content)
 			dm.contents.extend (queries_tool.sd_content)
@@ -83,7 +83,7 @@ feature {NONE} -- Initialization
 
 			if
 				f.exists and then f.is_readable and then
-				dm.open_config_with_path (create {PATH}.make_from_string ("layout.db")) -- side effect !!!
+				dm.open_config ("layout.db") -- side effect !!!
 			then
 
 			else
@@ -121,7 +121,7 @@ feature -- Action
 	on_quit
 		do
 			if attached docking_manager as dm then
-				if dm.save_data_with_path (create {PATH}.make_from_string ("layout.db")) then
+				if dm.save_data ("layout.db") then
 				else
 					-- .. too bad
 				end
@@ -413,7 +413,7 @@ feature -- Explore
 			create e
 			if {PLATFORM}.is_windows then
 				create cmd.make_empty
-				if attached e.item ("ComSpec") as l_comspec then
+				if attached e.get ("ComSpec") as l_comspec then
 					cmd.append (l_comspec)
 					cmd.append_string_general (" /c ")
 				end

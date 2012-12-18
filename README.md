@@ -5,7 +5,7 @@ Collection+JSON is a JSON-based read/write hypermedia-type designed to support m
 See http://www.amundsen.com/media-types/collection/
 
 Requirement:
-compile with EiffelStudio 7.2
+compile with EiffelStudio 7.1
 
 Try with
 http://employee.herokuapp.com

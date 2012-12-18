@@ -1,5 +1,5 @@
 Requirement:
-compile with EiffelStudio 7.2
+compile with EiffelStudio 7.1
 
 -- Administration purpose
 git remote add -f ewf https://github.com/EiffelWebFramework/EWF.git

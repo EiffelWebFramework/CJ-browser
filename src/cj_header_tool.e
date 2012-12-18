@@ -76,7 +76,7 @@ feature {NONE} -- Initialization
 				g.set_item (1, n, edit)
 				edit.pointer_button_release_actions.force_extend (agent edit.activate)
 			end
-			if a_name /= Void and then a_name.is_case_insensitive_equal ("Authorization") then
+			if a_name /= Void and then a_name.as_lower.is_equal ("authorization") then
 				create edit
 				g.set_item (2, n, edit)
 				edit.set_tooltip ("Click to edit. Right Click to add basic authorization ...")
