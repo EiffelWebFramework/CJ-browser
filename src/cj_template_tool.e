@@ -44,9 +44,11 @@ feature -- Change
 			hb: EV_HORIZONTAL_BOX
 			lab: EV_LABEL
 			tf: EV_TEXT_FIELD
+			tf_passwd: EV_PASSWORD_FIELD
 			but: EV_BUTTON
 			table: HASH_TABLE [EV_TEXT_FIELD, STRING_32]
 			is_creation: BOOLEAN
+			is_password: BOOLEAN
 		do
 			create v
 			v.set_border_width (3)
@@ -59,24 +61,47 @@ feature -- Change
 				create lab.make_with_text (d.item.name)
 				if attached d.item.prompt as p then
 					lab.set_text (p)
+					if p.is_case_insensitive_equal ("Password") then
+						is_password := True
+					else
+						is_password := False
+					end
 				end
 				create hb
 				hb.set_padding_width (3)
-				create tf
-				if attached d.item.value as l_val then
-					if not l_val.is_empty then
-						is_creation := False
+				if is_password then
+					create tf_passwd
+					if attached d.item.value as l_val then
+						if not l_val.is_empty then
+								is_creation := False
+						end
+						tf_passwd.set_text (l_val)
+					else
+						tf_passwd.remove_text
 					end
-					tf.set_text (l_val)
-				else
-					tf.remove_text
+					hb.extend (lab)
+					hb.disable_item_expand (lab)
+					hb.extend (tf_passwd)
+					v.extend (hb)
+					v.disable_item_expand (hb)
+					table.force (tf_passwd, d.item.name)
+                else
+					create tf
+					if attached d.item.value as l_val then
+						if not l_val.is_empty then
+							is_creation := False
+						end
+						tf.set_text (l_val)
+					else
+						tf.remove_text
+					end
+					hb.extend (lab)
+					hb.disable_item_expand (lab)
+					hb.extend (tf)
+					v.extend (hb)
+					v.disable_item_expand (hb)
+					table.force (tf, d.item.name)
 				end
-				hb.extend (lab)
-				hb.disable_item_expand (lab)
-				hb.extend (tf)
-				v.extend (hb)
-				v.disable_item_expand (hb)
-				table.force (tf, d.item.name)
 			end
 			widget.replace (v)
 			if is_creation then
