@@ -9,8 +9,9 @@ deferred class
 
 feature {NONE} -- Initialization
 
-	make (cl: like cj_client)
+	make (cl: like cj_client; dm: like docking_manager)
 		do
+			docking_manager := dm
 			cj_client := cl
 			create_interface_objects
 			initialize
@@ -22,11 +23,13 @@ feature {NONE} -- Initialization
 
 	initialize
 		do
-			create sd_content.make_with_widget (widget, title)
+			create sd_content.make_with_widget (widget, title, docking_manager)
 			sd_content.set_short_title (title)
 			sd_content.set_long_title (title)
 			sd_content.close_request_actions.extend (agent hide)
 		end
+
+	docking_manager: SD_DOCKING_MANAGER
 
 feature -- Access
 

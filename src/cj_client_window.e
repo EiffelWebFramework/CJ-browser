@@ -8,17 +8,35 @@ class
 	CJ_CLIENT_WINDOW
 
 inherit
-	EV_TITLED_WINDOW
+	ANY
 		redefine
-			initialize,
-			create_interface_objects
+			default_create
 		end
 
 feature {NONE} -- Initialization
 
-	create_interface_objects
+	default_create
 		do
-			Precursor
+			create_interface_objects
+			initialize_tools (docking_manager)
+			initialize
+		end
+
+feature -- Access
+
+	window: EV_TITLED_WINDOW
+
+	main_box: EV_VERTICAL_BOX
+
+
+feature {NONE} -- Initialization
+
+	create_interface_objects
+		local
+			win: EV_TITLED_WINDOW
+			vb: EV_VERTICAL_BOX
+			dm: SD_DOCKING_MANAGER
+		do
 			create field_url
 
 			create button_go.make_with_text ("Go")
@@ -26,15 +44,27 @@ feature {NONE} -- Initialization
 
 			create cj_client_proxy.make (create {CJ_CLIENT}.make (""))
 
-			create information_tool.make (cj_client_proxy)
-			create queries_tool.make (cj_client_proxy)
-			queries_tool.on_query_actions.extend (agent explore_query)
-			create template_tool.make (cj_client_proxy)
-			create formatted_body_tool.make (cj_client_proxy)
-			create http_response_tool.make (cj_client_proxy)
-			create header_tool.make (cj_client_proxy)
+			create win
+			create vb
+			win.extend (vb)
+			window := win
+			main_box := vb
+
+			create dm.make (vb, window)
+			docking_manager := dm
 
 			cj_client_proxy.context_adaptation_agents.extend (agent updated_context)
+		end
+
+	initialize_tools (dm: SD_DOCKING_MANAGER)
+		do
+			create information_tool.make (cj_client_proxy, dm)
+			create queries_tool.make (cj_client_proxy, dm)
+			create template_tool.make (cj_client_proxy, dm)
+			create formatted_body_tool.make (cj_client_proxy, dm)
+			create http_response_tool.make (cj_client_proxy, dm)
+			create header_tool.make (cj_client_proxy, dm)
+			queries_tool.on_query_actions.extend (agent explore_query)
 		end
 
 	initialize
@@ -47,10 +77,7 @@ feature {NONE} -- Initialization
 			dm: like docking_manager
 			f: RAW_FILE
 		do
-			Precursor
-			create vb
-			extend (vb)
-
+			vb := main_box
 			vb.set_border_width (3)
 
 			create hb
@@ -69,11 +96,10 @@ feature {NONE} -- Initialization
 			vb.extend (hb)
 			vb.disable_item_expand (hb)
 
-
-			create dm.make (vb, Current)
-			docking_manager := dm
+			dm := docking_manager
 			create f.make ("layout.db")
 			dm.close_editor_place_holder
+			initialize_tools (dm)
 			dm.contents.extend (information_tool.sd_content)
 			dm.contents.extend (queries_tool.sd_content)
 			dm.contents.extend (template_tool.sd_content)
@@ -97,8 +123,8 @@ feature {NONE} -- Initialization
 				information_tool.set_focus
 			end
 
-			set_title ("Collection-JSON explorer")
-			set_size (800, 600)
+			window.set_title ("Collection-JSON explorer")
+			window.set_size (800, 600)
 
 			initialize_actions
 
@@ -113,10 +139,15 @@ feature {NONE} -- Initialization
 			button_go.select_actions.extend (agent on_go)
 			button_settings.select_actions.extend (agent on_settings)
 
-			close_request_actions.extend (agent on_quit)
+			window.close_request_actions.extend (agent on_quit)
 		end
 
 feature -- Action
+
+	show
+		do
+			window.show
+		end
 
 	on_quit
 		do
@@ -126,7 +157,7 @@ feature -- Action
 					-- .. too bad
 				end
 			end
-			destroy_and_exit_if_last
+			window.destroy_and_exit_if_last
 		end
 
 	on_go
@@ -185,14 +216,14 @@ feature -- Explore
 			last_collection := Void
 			if not retried then
 				set_field_url_from_location (q.href)
-				set_pointer_style (stock_pixmaps.Busy_cursor)
+				window.set_pointer_style (stock_pixmaps.Busy_cursor)
 				if
 					attached cj_client_proxy.query (q, Void) as resp
 				then
 					set_response (resp)
 				end
 			end
-			set_pointer_style (stock_pixmaps.Standard_cursor)
+			window.set_pointer_style (stock_pixmaps.Standard_cursor)
 		rescue
 			retried := True
 			retry
@@ -225,7 +256,7 @@ feature -- Explore
 			last_collection := Void
 			if not retried then
 				set_field_url_from_location (a_url)
-				set_pointer_style (stock_pixmaps.Busy_cursor)
+				window.set_pointer_style (stock_pixmaps.Busy_cursor)
 
 				if
 					attached cj_client_proxy.get (a_url, Void) as resp
@@ -234,7 +265,7 @@ feature -- Explore
 				end
 			end
 
-			set_pointer_style (stock_pixmaps.Standard_cursor)
+			window.set_pointer_style (stock_pixmaps.Standard_cursor)
 		rescue
 			retried := True
 			retry
@@ -613,6 +644,7 @@ feature -- Tools
 	formatted_body_tool: CJ_FORMATTED_BODY_TOOL
 
 	http_response_tool: CJ_HTTP_RESPONSE_TOOL
+
 	header_tool: CJ_HEADER_TOOL
 
 feature -- Widget
@@ -641,7 +673,7 @@ feature -- Widget
 
 feature -- UI widgets
 
-	docking_manager: detachable SD_DOCKING_MANAGER
+	docking_manager: SD_DOCKING_MANAGER
 
 	set_template_tab_displayed (b: BOOLEAN)
 		do

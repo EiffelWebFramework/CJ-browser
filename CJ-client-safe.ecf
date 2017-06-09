@@ -11,7 +11,7 @@
 		</option>
 		<setting name="concurrency" value="thread"/>
 		<library name="base" location="$ISE_LIBRARY\library\base\base-safe.ecf"/>
-		<library name="cj" location="lib\CJ\library\cj-safe.ecf"/>
+		<library name="cj" location="lib\CJ\library\cj-safe.ecf" readonly="false"/>
 		<library name="docking" location="$ISE_LIBRARY\library\docking\docking-safe.ecf"/>
 		<library name="encoder" location="lib\EWF\library\text\encoder\encoder-safe.ecf"/>
 		<library name="http" location="lib\EWF\library\network\protocol\http\http-safe.ecf" readonly="false"/>

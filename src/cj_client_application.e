@@ -36,6 +36,6 @@ feature {NONE} -- Initialization
 
 feature {NONE} -- Implementation
 
-	main_window: detachable EV_WINDOW
+	main_window: detachable CJ_CLIENT_WINDOW
 
 end

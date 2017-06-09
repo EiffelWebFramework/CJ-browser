@@ -44,7 +44,7 @@ feature -- Conversion
         local
 			failed: BOOLEAN
         do
-            create Result.make_array
+            create Result.make (o.count)
             across
             	o as c
             loop

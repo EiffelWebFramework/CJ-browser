@@ -115,7 +115,7 @@ feature -- Access
 			end
 			l_ctx.add_header ("Content-Type", "application/vnd.collection+json")
 			l_ctx.add_header ("Accept", "application/vnd.collection+json")
-				
+
 
 			if attached cj_template_to_json (tpl) as j then
 				d := "{ %"template%": " + j.representation + " }"
@@ -266,9 +266,10 @@ feature -- Access
 		local
 			p: JSON_PARSER
 		do
-			create p.make_parser (s)
+			create p.make_with_string (s)
+			p.parse_content
 			if
-				attached p.parse as v and then
+				attached p.parsed_json_value as v and then
 				p.is_parsed
 			then
 				Result := v
